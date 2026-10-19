@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+*{
+  font-family: "Outfit", sans-serif;
+}
+@theme {
+  --color-primary: #4fbf8b;
+  --color-primary-dull: #44ae7c;
+  --color-navbar-bg: #f4e8d1;
+}
+
+/* this is  */
+
+
+.no-scrollbar::-webkit-scrollbar{
+  display: none;
+}
+
+/* Custom navbar background - light orange-green mix */
+.navbar-bg {
+  background: linear-gradient(135deg, #f4e8d1 0%, #e8f4d1 50%, #f4e8d1 100%);
+}

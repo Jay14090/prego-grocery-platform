@@ -1,0 +1,52 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: prego_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  server:
+    build: ./server
+    container_name: prego_server
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      # Local MongoDB — avoids the unreliable external Atlas connection.
+      MONGODB_URI: mongodb://mongo:27017/greencart
+      JWT_SECRET: ${JWT_SECRET}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      SELLER_EMAIL: ${SELLER_EMAIL}
+      SELLER_PASSWORD: ${SELLER_PASSWORD}
+      CLIENT_URL: http://localhost:5173
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    container_name: prego_client
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
